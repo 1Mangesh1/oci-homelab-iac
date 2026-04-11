@@ -33,3 +33,8 @@ variable "ssh_public_key" {
   type        = string
   description = "SSH public key for instance access"
 }
+
+variable "availability_domain" {
+  type        = string
+  description = "Availability domain for compute instances"
+}

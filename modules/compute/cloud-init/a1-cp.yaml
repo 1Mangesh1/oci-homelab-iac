@@ -1,0 +1,55 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - wget
+  - vim
+  - htop
+  - git
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+  - ca-certificates
+  - gnupg
+  - lsb-release
+
+# Harden SSH: disable password auth, disable root login.
+write_files:
+  - path: /etc/ssh/sshd_config.d/99-hardening.conf
+    content: |
+      PasswordAuthentication no
+      PermitRootLogin no
+      PubkeyAuthentication yes
+      X11Forwarding no
+    permissions: '0644'
+
+  - path: /etc/fail2ban/jail.d/sshd.conf
+    content: |
+      [sshd]
+      enabled = true
+      maxretry = 3
+      bantime = 3600
+    permissions: '0644'
+
+runcmd:
+  # Reload sshd to pick up hardening
+  - systemctl restart ssh
+
+  # Open firewall: SSH only for now (k3s ports come later)
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow 22/tcp
+  - ufw --force enable
+
+  # Enable and start fail2ban
+  - systemctl enable --now fail2ban
+
+  # Enable automatic security updates
+  - dpkg-reconfigure -plow unattended-upgrades
+
+  # Marker file so you can grep for "cloud-init done" via SSH
+  - echo "cloud-init finished at $(date)" > /var/log/cloud-init-done.log
+
+final_message: "a1-cp ready after $UPTIME seconds"

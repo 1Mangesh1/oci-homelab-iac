@@ -17,3 +17,11 @@ output "web_nsg_id" {
 output "wireguard_nsg_id" {
   value = module.security.wireguard_nsg_id
 }
+
+output "a1_cp_public_ip" {
+  value = module.compute.a1_cp_public_ip
+}
+
+output "a1_cp_private_ip" {
+  value = module.compute.a1_cp_private_ip
+}

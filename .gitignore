@@ -28,4 +28,6 @@ Thumbs.db
 .idea/
 *.swp
 
+# Notes / scratch (not for git)
 commands.md
+outputs.log
